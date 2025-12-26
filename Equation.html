@@ -498,16 +498,16 @@
             // EQ-8: Law of cosines
             const d65_sq = (x6-x5)*(x6-x5) + (y6-y5)*(y6-y5);
             const d52_sq = (x5-x2)*(x5-x2) + (y5-y2)*(y5-y2);
-            residuals.push(d65_sq - d62_sq - d52_sq + 2*Math.sqrt(d62_sq * d52_sq)*Math.cos(beta));
+            residuals.push(d65_sq - d62_sq - d52_sq - 2*Math.sqrt(d62_sq * d52_sq)*Math.cos(beta));
 
             // EQ-9: Law of cosines
             const d53_sq = (x5-x3)*(x5-x3) + (y5-y3)*(y5-y3);
             const d32_sq = (x3-x2)*(x3-x2) + (y3-y2)*(y3-y2);
-            residuals.push(d53_sq - d52_sq - d32_sq + 2*Math.sqrt(d52_sq * d32_sq)*Math.cos(epsilon));
+            residuals.push(d53_sq - d52_sq - d32_sq - 2*Math.sqrt(d52_sq * d32_sq)*Math.cos(epsilon));
 
             // EQ-10: Law of cosines
             const d63_sq = (x6-x3)*(x6-x3) + (y6-y3)*(y6-y3);
-            residuals.push(d63_sq - d62_sq - d32_sq + 2*Math.sqrt(d62_sq * d32_sq)*Math.cos(beta + epsilon));
+            residuals.push(d63_sq - d62_sq - d32_sq - 2*Math.sqrt(d62_sq * d32_sq)*Math.cos(beta + epsilon));
 
             // EQ-11: Law of cosines
             const d31_sq = (x3-x1)*(x3-x1) + (y3-y1)*(y3-y1);
@@ -516,7 +516,7 @@
             // EQ-12: Law of cosines
             const d43_sq = (x4-x3)*(x4-x3) + (y4-y3)*(y4-y3);
             const d54_sq = (x5-x4)*(x5-x4) + (y5-y4)*(y5-y4);
-            residuals.push(d53_sq - d43_sq - d54_sq + 2*Math.sqrt(d43_sq * d54_sq)*Math.cos(alpha));
+            residuals.push(d53_sq - d43_sq - d54_sq - 2*Math.sqrt(d43_sq * d54_sq)*Math.cos(alpha));
 
             // EQ-13: x2² + y2² = (x2-x1)² + (y2-y1)² + x1² + y1²
             residuals.push(x2*x2 + y2*y2 - d21_sq - x1*x1 - y1*y1);
