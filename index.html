@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometric Equation Solver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #764ba2;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .output-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .output-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .output-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .output-box label {
+            display: block;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .output-box .value {
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            word-break: break-all;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .solve-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .solve-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .solve-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .reset-btn {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .reset-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .check-section {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+
+        .check-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .check-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .check-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .check-value.success {
+            color: #28a745;
+        }
+
+        .check-value.warning {
+            color: #ffc107;
+        }
+
+        .check-value.error {
+            color: #dc3545;
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Geometric Equation Solver</h1>
+        <p class="subtitle">Solve for 13 unknowns using numerical optimization</p>
+
+        <div class="section">
+            <h2 class="section-title">📝 Known Values (Input)</h2>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="alpha">α (alpha) - angle in radians</label>
+                    <input type="number" id="alpha" step="0.0001" placeholder="e.g., 1.5708" value="1.5708">
+                </div>
+                <div class="input-group">
+                    <label for="beta">β (beta) - angle in radians</label>
+                    <input type="number" id="beta" step="0.0001" placeholder="e.g., 0.5236" value="0.5236">
+                </div>
+                <div class="input-group">
+                    <label for="epsilon">ε (epsilon) - angle in radians</label>
+                    <input type="number" id="epsilon" step="0.0001" placeholder="e.g., 0.7854" value="0.7854">
+                </div>
+                <div class="input-group">
+                    <label for="z">z - distance value</label>
+                    <input type="number" id="z" step="0.0001" placeholder="e.g., 1.0" value="1.0">
+                </div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="solve-btn" id="solveBtn" onclick="solveEquations()">🚀 Solve Equations</button>
+            <button class="reset-btn" onclick="resetForm()">🔄 Reset</button>
+        </div>
+
+        <div id="statusDiv"></div>
+
+        <div class="section" style="margin-top: 40px;">
+            <h2 class="section-title">✨ Calculated Values (Output)</h2>
+            <div class="output-grid">
+                <div class="output-box">
+                    <label>x₁</label>
+                    <div class="value" id="x1">-</div>
+                </div>
+                <div class="output-box">
+                    <label>y₁</label>
+                    <div class="value" id="y1">-</div>
+                </div>
+                <div class="output-box">
+                    <label>x₂</label>
+                    <div class="value" id="x2">-</div>
+                </div>
+                <div class="output-box">
+                    <label>y₂</label>
+                    <div class="value" id="y2">-</div>
+                </div>
+                <div class="output-box">
+                    <label>x₃</label>
+                    <div class="value" id="x3">-</div>
+                </div>
+                <div class="output-box">
+                    <label>y₃</label>
+                    <div class="value" id="y3">-</div>
+                </div>
+                <div class="output-box">
+                    <label>x₄</label>
+                    <div class="value" id="x4">-</div>
+                </div>
+                <div class="output-box">
+                    <label>y₄</label>
+                    <div class="value" id="y4">-</div>
+                </div>
+                <div class="output-box">
+                    <label>x₅</label>
+                    <div class="value" id="x5">-</div>
+                </div>
+                <div class="output-box">
+                    <label>y₅</label>
+                    <div class="value" id="y5">-</div>
+                </div>
+                <div class="output-box">
+                    <label>x₆</label>
+                    <div class="value" id="x6">-</div>
+                </div>
+                <div class="output-box">
+                    <label>y₆</label>
+                    <div class="value" id="y6">-</div>
+                </div>
+                <div class="output-box">
+                    <label>r</label>
+                    <div class="value" id="r">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="check-section">
+            <h2 class="section-title">✅ Verification Check</h2>
+            <div class="check-result">
+                <span class="check-label">Target Distance |ab|:</span>
+                <span class="check-value">0.1943</span>
+            </div>
+            <div class="check-result">
+                <span class="check-label">Calculated √[(x₄-x₃)² + (y₄-y₃)²]:</span>
+                <span class="check-value" id="calculatedDist">-</span>
+            </div>
+            <div class="check-result">
+                <span class="check-label">Error (%):</span>
+                <span class="check-value" id="errorPercent">-</span>
+            </div>
+            <div class="check-result">
+                <span class="check-label">Total Residual:</span>
+                <span class="check-value" id="residual">-</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Numerical solver using Levenberg-Marquardt algorithm
+        function solveEquations() {
+            const alpha = parseFloat(document.getElementById('alpha').value);
+            const beta = parseFloat(document.getElementById('beta').value);
+            const epsilon = parseFloat(document.getElementById('epsilon').value);
+            const z = parseFloat(document.getElementById('z').value);
+            const targetDist = 0.1943;
+
+            if (isNaN(alpha) || isNaN(beta) || isNaN(epsilon) || isNaN(z)) {
+                showStatus('Please enter all known values (α, β, ε, z)', 'error');
+                return;
+            }
+
+            const solveBtn = document.getElementById('solveBtn');
+            solveBtn.disabled = true;
+            showStatus('Solving using numerical optimization... <span class="loading"></span>', 'info');
+
+            setTimeout(() => {
+                try {
+                    const solution = numericalSolve(alpha, beta, epsilon, z, targetDist);
+                    displaySolution(solution, alpha, beta, epsilon, z, targetDist);
+                    solveBtn.disabled = false;
+                } catch (error) {
+                    showStatus('Error: ' + error.message, 'error');
+                    solveBtn.disabled = false;
+                }
+            }, 100);
+        }
+
+        function numericalSolve(alpha, beta, epsilon, z, targetDist) {
+            // Initial guess - strategically chosen
+            let vars = [
+                0.5, 0.5,  // x1, y1
+                0.7, 0.3,  // x2, y2
+                0.8, 0.4,  // x3, y3
+                0.6, 0.8,  // x4, y4
+                0.9, 0.5,  // x5, y5
+                0.85, 0.6, // x6, y6
+                0.5        // r
+            ];
+
+            const maxIterations = 5000;
+            const tolerance = 1e-8;
+            let lambda = 0.01;
+            let bestVars = [...vars];
+            let bestError = Infinity;
+
+            for (let iter = 0; iter < maxIterations; iter++) {
+                const residuals = computeResiduals(vars, alpha, beta, epsilon, z, targetDist);
+                const error = residuals.reduce((sum, r) => sum + r * r, 0);
+
+                if (error < bestError) {
+                    bestError = error;
+                    bestVars = [...vars];
+                }
+
+                if (error < tolerance) {
+                    break;
+                }
+
+                const J = computeJacobian(vars, alpha, beta, epsilon, z, targetDist);
+                const JT = transpose(J);
+                const JTJ = multiply(JT, J);
+                
+                // Add damping (Levenberg-Marquardt)
+                for (let i = 0; i < JTJ.length; i++) {
+                    JTJ[i][i] += lambda;
+                }
+
+                const JTr = multiplyVector(JT, residuals);
+                const delta = solveLinearSystem(JTJ, JTr);
+
+                if (delta) {
+                    const newVars = vars.map((v, i) => v - delta[i]);
+                    const newResiduals = computeResiduals(newVars, alpha, beta, epsilon, z, targetDist);
+                    const newError = newResiduals.reduce((sum, r) => sum + r * r, 0);
+
+                    if (newError < error) {
+                        vars = newVars;
+                        lambda *= 0.7;
+                    } else {
+                        lambda *= 1.5;
+                    }
+                } else {
+                    lambda *= 2;
+                }
+
+                if (lambda > 1e10) break;
+            }
+
+            return bestVars;
+        }
+
+        function computeResiduals(vars, alpha, beta, epsilon, z, targetDist) {
+            const [x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6, r] = vars;
+            const residuals = [];
+
+            // EQ-1: x4² + y4² = z²
+            residuals.push(x4*x4 + y4*y4 - z*z);
+
+            // EQ-2: (x5-x4)² + (y5-y4)² = x1² + y1²
+            residuals.push((x5-x4)*(x5-x4) + (y5-y4)*(y5-y4) - x1*x1 - y1*y1);
+
+            // EQ-3: (x3-x2)² + (y3-y2)² = r²
+            residuals.push((x3-x2)*(x3-x2) + (y3-y2)*(y3-y2) - r*r);
+
+            // EQ-4: (x5-x2)² + (y5-y2)² = r²
+            residuals.push((x5-x2)*(x5-x2) + (y5-y2)*(y5-y2) - r*r);
+
+            // EQ-5: (x6-x2)² + (y6-y2)² = r²
+            residuals.push((x6-x2)*(x6-x2) + (y6-y2)*(y6-y2) - r*r);
+
+            // EQ-6: (x2-x1)² + (y2-y1)² + (x5-x2)² + (y5-y2)² = z²
+            residuals.push((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (x5-x2)*(x5-x2) + (y5-y2)*(y5-y2) - z*z);
+
+            // EQ-7: Law of cosines for triangle
+            const d61_sq = (x6-x1)*(x6-x1) + (y6-y1)*(y6-y1);
+            const d62_sq = (x6-x2)*(x6-x2) + (y6-y2)*(y6-y2);
+            const d21_sq = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1);
+            residuals.push(d61_sq - d62_sq - d21_sq + 2*Math.sqrt(d62_sq * d21_sq)*Math.cos(beta));
+
+            // EQ-8: Law of cosines
+            const d65_sq = (x6-x5)*(x6-x5) + (y6-y5)*(y6-y5);
+            const d52_sq = (x5-x2)*(x5-x2) + (y5-y2)*(y5-y2);
+            residuals.push(d65_sq - d62_sq - d52_sq - 2*Math.sqrt(d62_sq * d52_sq)*Math.cos(beta));
+
+            // EQ-9: Law of cosines
+            const d53_sq = (x5-x3)*(x5-x3) + (y5-y3)*(y5-y3);
+            const d32_sq = (x3-x2)*(x3-x2) + (y3-y2)*(y3-y2);
+            residuals.push(d53_sq - d52_sq - d32_sq - 2*Math.sqrt(d52_sq * d32_sq)*Math.cos(epsilon));
+
+            // EQ-10: Law of cosines
+            const d63_sq = (x6-x3)*(x6-x3) + (y6-y3)*(y6-y3);
+            residuals.push(d63_sq - d62_sq - d32_sq - 2*Math.sqrt(d62_sq * d32_sq)*Math.cos(beta + epsilon));
+
+            // EQ-11: Law of cosines
+            const d31_sq = (x3-x1)*(x3-x1) + (y3-y1)*(y3-y1);
+            residuals.push(d31_sq - d32_sq - d21_sq + 2*Math.sqrt(d32_sq * d21_sq)*Math.cos(epsilon));
+
+            // EQ-12: Law of cosines
+            const d43_sq = (x4-x3)*(x4-x3) + (y4-y3)*(y4-y3);
+            const d54_sq = (x5-x4)*(x5-x4) + (y5-y4)*(y5-y4);
+            residuals.push(d53_sq - d43_sq - d54_sq - 2*Math.sqrt(d43_sq * d54_sq)*Math.cos(alpha));
+
+            // EQ-13: x2² + y2² = (x2-x1)² + (y2-y1)² + x1² + y1²
+            residuals.push(x2*x2 + y2*y2 - d21_sq - x1*x1 - y1*y1);
+
+            // Constraint: distance check
+            const calcDist = Math.sqrt(d43_sq);
+            residuals.push((calcDist - targetDist) * 10); // Weighted constraint
+
+            return residuals;
+        }
+
+        function computeJacobian(vars, alpha, beta, epsilon, z, targetDist) {
+            const h = 1e-7;
+            const residuals = computeResiduals(vars, alpha, beta, epsilon, z, targetDist);
+            const J = [];
+
+            for (let i = 0; i < residuals.length; i++) {
+                J[i] = [];
+                for (let j = 0; j < vars.length; j++) {
+                    const varsPlus = [...vars];
+                    varsPlus[j] += h;
+                    const residualsPlus = computeResiduals(varsPlus, alpha, beta, epsilon, z, targetDist);
+                    J[i][j] = (residualsPlus[i] - residuals[i]) / h;
+                }
+            }
+            return J;
+        }
+
+        function transpose(matrix) {
+            return matrix[0].map((_, i) => matrix.map(row => row[i]));
+        }
+
+        function multiply(A, B) {
+            const result = [];
+            for (let i = 0; i < A.length; i++) {
+                result[i] = [];
+                for (let j = 0; j < B[0].length; j++) {
+                    result[i][j] = 0;
+                    for (let k = 0; k < A[0].length; k++) {
+                        result[i][j] += A[i][k] * B[k][j];
+                    }
+                }
+            }
+            return result;
+        }
+
+        function multiplyVector(matrix, vector) {
+            return matrix.map(row => 
+                row.reduce((sum, val, i) => sum + val * vector[i], 0)
+            );
+        }
+
+        function solveLinearSystem(A, b) {
+            const n = A.length;
+            const augmented = A.map((row, i) => [...row, b[i]]);
+
+            for (let i = 0; i < n; i++) {
+                let maxRow = i;
+                for (let k = i + 1; k < n; k++) {
+                    if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
+                        maxRow = k;
+                    }
+                }
+                [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
+
+                if (Math.abs(augmented[i][i]) < 1e-10) continue;
+
+                for (let k = i + 1; k < n; k++) {
+                    const factor = augmented[k][i] / augmented[i][i];
+                    for (let j = i; j <= n; j++) {
+                        augmented[k][j] -= factor * augmented[i][j];
+                    }
+                }
+            }
+
+            const x = new Array(n);
+            for (let i = n - 1; i >= 0; i--) {
+                x[i] = augmented[i][n];
+                for (let j = i + 1; j < n; j++) {
+                    x[i] -= augmented[i][j] * x[j];
+                }
+                x[i] /= augmented[i][i];
+            }
+
+            return x;
+        }
+
+        function displaySolution(vars, alpha, beta, epsilon, z, targetDist) {
+            const [x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6, r] = vars;
+
+            document.getElementById('x1').textContent = x1.toFixed(6);
+            document.getElementById('y1').textContent = y1.toFixed(6);
+            document.getElementById('x2').textContent = x2.toFixed(6);
+            document.getElementById('y2').textContent = y2.toFixed(6);
+            document.getElementById('x3').textContent = x3.toFixed(6);
+            document.getElementById('y3').textContent = y3.toFixed(6);
+            document.getElementById('x4').textContent = x4.toFixed(6);
+            document.getElementById('y4').textContent = y4.toFixed(6);
+            document.getElementById('x5').textContent = x5.toFixed(6);
+            document.getElementById('y5').textContent = y5.toFixed(6);
+            document.getElementById('x6').textContent = x6.toFixed(6);
+            document.getElementById('y6').textContent = y6.toFixed(6);
+            document.getElementById('r').textContent = r.toFixed(6);
+
+            const calcDist = Math.sqrt((x4-x3)*(x4-x3) + (y4-y3)*(y4-y3));
+            const errorPct = Math.abs((calcDist - targetDist) / targetDist * 100);
+            const residuals = computeResiduals(vars, alpha, beta, epsilon, z, targetDist);
+            const totalResidual = Math.sqrt(residuals.reduce((sum, r) => sum + r*r, 0));
+
+            document.getElementById('calculatedDist').textContent = calcDist.toFixed(6);
+            const errorElem = document.getElementById('errorPercent');
+            errorElem.textContent = errorPct.toFixed(4) + '%';
+            errorElem.className = 'check-value ' + (errorPct < 1 ? 'success' : errorPct < 5 ? 'warning' : 'error');
+
+            const residualElem = document.getElementById('residual');
+            residualElem.textContent = totalResidual.toFixed(8);
+            residualElem.className = 'check-value ' + (totalResidual < 0.01 ? 'success' : totalResidual < 0.1 ? 'warning' : 'error');
+
+            if (totalResidual < 0.01) {
+                showStatus('✅ Solution converged successfully! Error: ' + errorPct.toFixed(4) + '%', 'success');
+            } else {
+                showStatus('⚠️ Solution found but may not be optimal. Try different initial values or check constraints.', 'error');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('alpha').value = '1.5708';
+            document.getElementById('beta').value = '0.5236';
+            document.getElementById('epsilon').value = '0.7854';
+            document.getElementById('z').value = '1.0';
+
+            const outputs = ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4', 'x5', 'y5', 'x6', 'y6', 'r', 'calculatedDist', 'errorPercent', 'residual'];
+            outputs.forEach(id => {
+                document.getElementById(id).textContent = '-';
+                document.getElementById(id).className = 'check-value';
+            });
+
+            document.getElementById('statusDiv').innerHTML = '';
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusDiv');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+    </script>
+</body>
+</html>
